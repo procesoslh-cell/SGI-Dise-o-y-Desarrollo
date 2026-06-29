@@ -1,0 +1,24 @@
+{
+  "name": "sgi-diseno-desarrollo",
+  "version": "1.5.0",
+  "private": true,
+  "type": "module",
+  "description": "Sistema de gestión del proceso de diseño y desarrollo de productos.",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "npm --workspace apps/frontend run dev",
+    "dev:backend": "npm --workspace apps/backend run dev",
+    "build": "npm --workspace apps/frontend run build",
+    "start": "npm --workspace apps/backend run start",
+    "seed": "npm --workspace apps/backend run seed"
+  },
+  "workspaces": [
+    "apps/frontend",
+    "apps/backend",
+    "packages/shared"
+  ],
+  "dependencies": {
+    "@vitejs/plugin-react": "4.2.1",
+    "concurrently": "8.2.2"
+  }
+}

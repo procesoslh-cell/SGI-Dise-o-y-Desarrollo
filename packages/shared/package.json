@@ -1,0 +1,7 @@
+{
+  "name": "@sgi-dyd/shared",
+  "version": "1.5.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}
