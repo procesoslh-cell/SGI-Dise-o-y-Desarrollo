@@ -1,0 +1,25 @@
+{
+  "name": "sgi-diseno-desarrollo",
+  "version": "1.8.2",
+  "private": true,
+  "type": "module",
+  "description": "SGI modular para la gestión del diseño, desarrollo y lanzamiento de productos.",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "npm --workspace frontend run dev",
+    "dev:backend": "npm --workspace backend run dev",
+    "build": "npm --workspace frontend run build",
+    "start": "npm --workspace backend run start",
+    "seed": "npm --workspace backend run seed",
+    "check": "node --check backend/src/server.js && npm run build"
+  },
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
+  "dependencies": {
+    "@vitejs/plugin-react": "4.2.1",
+    "concurrently": "8.2.2"
+  }
+}

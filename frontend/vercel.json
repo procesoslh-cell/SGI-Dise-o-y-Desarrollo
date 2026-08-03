@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://sgi-dise-o-y-desarrollo.onrender.com/api/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://sgi-dise-o-y-desarrollo.onrender.com/uploads/:path*"
+    }
+  ]
+}

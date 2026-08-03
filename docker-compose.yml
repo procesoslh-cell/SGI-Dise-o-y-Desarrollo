@@ -1,0 +1,13 @@
+services:
+  sgi-diseno-desarrollo:
+    build: .
+    container_name: sgi-diseno-desarrollo
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      JWT_SECRET: change-this-secret-in-production
+      CORS_ORIGIN: http://localhost:4000
+    volumes:
+      - ./backend/data:/app/backend/data
+      - ./backend/uploads:/app/backend/uploads
