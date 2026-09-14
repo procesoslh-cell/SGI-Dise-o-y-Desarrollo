@@ -19,6 +19,21 @@ export function createApp() {
   app.use(express.json({ limit: '12mb' }));
   app.use('/uploads', express.static(env.uploadDir));
 
+  app.get('/api/health', async (req, res, next) => {
+    try {
+      const database = await db.health();
+      res.json({
+        status: 'ok',
+        service: 'SGI Diseño y Desarrollo',
+        database: 'postgresql',
+        databaseStatus: database.ok ? 'ok' : 'error',
+        databaseTime: database.databaseTime
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   const routers = [
     createAuthRouter(db),
     createBootstrapRouter(db),
@@ -29,7 +44,6 @@ export function createApp() {
     createUsersRouter(db)
   ];
   routers.forEach((router) => app.use('/api', router));
-
 
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const frontendDist = path.resolve(__dirname, '..', '..', 'frontend', 'dist');
