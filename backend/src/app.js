@@ -27,7 +27,13 @@ export function createApp() {
         service: 'SGI Diseño y Desarrollo',
         database: 'postgresql',
         databaseStatus: database.ok ? 'ok' : 'error',
-        databaseTime: database.databaseTime
+        databaseTime: database.database_time || null,
+        normalizedEntities: {
+          users: database.users || 0,
+          projects: database.projects || 0,
+          projectStages: database.project_stages || 0,
+          marketingTasks: database.marketing_tasks || 0
+        }
       });
     } catch (error) {
       next(error);
