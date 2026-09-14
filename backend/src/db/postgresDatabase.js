@@ -68,6 +68,11 @@ export class PostgresDatabase {
     return this.writeQueue;
   }
 
+  async health() {
+    const { rows } = await this.pool.query('SELECT NOW() AS database_time');
+    return { ok: true, databaseTime: rows[0]?.database_time || null };
+  }
+
   async reset(data = this.initialData) {
     this.state = clone(data);
     await this.pool.query(
