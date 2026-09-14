@@ -1,7 +1,9 @@
-import fs from 'fs';
 import { env } from './config/env.js';
+import { PostgresDatabase } from './db/postgresDatabase.js';
 import { initialData } from './db/initialData.js';
 
-fs.mkdirSync(new URL('../data/', import.meta.url), { recursive: true });
-fs.writeFileSync(env.dataFile, JSON.stringify(initialData, null, 2));
-console.log(`Seed creado en ${env.dataFile}`);
+const db = await PostgresDatabase.connect(env.postgres, initialData);
+await db.reset(initialData);
+await db.close();
+
+console.log(`Seed cargado en PostgreSQL: ${env.postgres.database}`);
