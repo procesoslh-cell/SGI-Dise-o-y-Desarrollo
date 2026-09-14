@@ -1,6 +1,6 @@
 # SGI Diseño y Desarrollo · v1.8.2
 
-Versión simplificada y modular para gestionar desarrollos de producto, tareas, validaciones, calendario, Gantt y Plan de Marketing.
+Versión modular para gestionar desarrollos de producto, tareas, validaciones, calendario, Gantt y Plan de Marketing.
 
 ## Módulos
 
@@ -14,67 +14,73 @@ La operación diaria mantiene cinco módulos principales:
 
 El usuario administrador dispone además de **Usuarios**, para crear cuentas, asignar roles, cambiar contraseñas y activar o desactivar accesos.
 
-## Cambios de la v1.8.2
+## Plan de Marketing
 
-### Plan de Marketing
+Se incluye una plantilla base con 13 tareas de lanzamiento. Desde el Plan de Marketing se puede:
 
-Se incorporó una plantilla base con 13 tareas:
-
-1. Brief de producto para preparación campaña de comunicación — 2 días.
-2. Realización de fotos con fondo blanco — 2 días.
-3. Edición de fotos/redimensiones — 2 días.
-4. Producción audiovisual en exterior — 2 días.
-5. Edición material producción exterior — 4 días.
-6. Armado de news técnicos / envío asesores — 1 día.
-7. Envío difusión WhatsApp — 1 día.
-8. Realización de piezas RRSS — 2 días.
-9. Realización Mailing B2C — 1 día.
-10. Realización Banners web (desktop + mobile) — 1 día.
-11. Disponibilización de material externo para clientes B2B — 1 día.
-12. Comunicación interna del lanzamiento para todos los colaboradores — 1 día.
-13. Envío mailing lanzamiento a BBDD — 1 día.
-
-Desde el Plan de Marketing se puede:
-
-- Cargar las 13 tareas de una sola vez.
+- Cargar las tareas de una sola vez.
 - Asignar un usuario distinto a cada tarea.
-- Calcular las fechas de forma consecutiva según la duración.
-- Crear tareas individuales desde una plantilla o como tarea personalizada.
-- Reprogramar responsable y fechas desde la propia tarea.
+- Calcular fechas de forma consecutiva según duración.
+- Crear tareas individuales desde una plantilla o de forma personalizada.
+- Reprogramar responsable y fechas.
 - Adjuntar entregables y guardar avances parciales.
-- Enviar la tarea a validación del jefe del proyecto.
+- Enviar tareas a validación del jefe del proyecto.
 
-Cada plantilla tiene campos específicos según la actividad.
+## Calendario y Gantt
 
-### Calendario y Gantt
-
-- El Calendario asigna un color estable y diferente a cada tarea durante todo su período.
+- El Calendario asigna un color estable a cada tarea durante todo su período.
 - El tooltip muestra proyecto, tipo, responsable, fechas, estado y avance.
 - Se puede filtrar entre workflow, Plan de Marketing o ambos.
-- El Gantt incluye de forma explícita todas las tareas del Plan de Marketing.
-- El Gantt identifica cada fila como Workflow o Plan de Marketing.
+- El Gantt incluye las tareas de workflow y Plan de Marketing.
 
-### Usuarios
+## Usuarios
 
 El administrador puede:
 
 - Crear usuarios.
-- Elegir nombre de acceso, email y contraseña inicial.
+- Definir nombre de acceso, email y contraseña inicial.
 - Asignar roles.
-- Cambiar el rol o la contraseña.
+- Cambiar rol o contraseña.
 - Activar o desactivar cuentas.
 
-Se agregaron roles de prueba para Diseño, Audiovisual, Comercial y Recursos Humanos.
-
-### Alertas y correo
+## Alertas y correo
 
 Cuando se crea o reasigna una tarea del Plan de Marketing:
 
-- Se genera inmediatamente una notificación interna.
-- La notificación aparece en el popup al iniciar sesión y en Mis tareas.
+- Se genera una notificación interna.
+- La notificación aparece al iniciar sesión y en Mis tareas.
 - Se registra un correo en `emailOutbox`.
 - Si SMTP está configurado, el backend intenta enviarlo automáticamente.
-- Si SMTP no está configurado, queda con estado `Pendiente configuración SMTP` sin bloquear el sistema.
+- Si SMTP no está configurado, el correo queda pendiente sin bloquear el sistema.
+
+## PostgreSQL
+
+La rama `testing` utiliza PostgreSQL 16 como persistencia.
+
+Las entidades operativas principales se almacenan en tablas independientes:
+
+- `users`
+- `projects`
+- `project_stages`
+- `marketing_tasks`
+- `task_progress`
+- `notifications`
+- `email_outbox`
+
+Las colecciones todavía no normalizadas se mantienen temporalmente en `app_state` como JSONB. Esta estrategia permite migrar de forma progresiva sin romper la API ni el frontend existente.
+
+Al iniciar una base vacía, el backend crea el esquema automáticamente y carga los datos iniciales. Si detecta una instalación previa que todavía tiene las entidades principales embebidas en `app_state`, las migra a sus tablas específicas.
+
+Variables requeridas:
+
+```env
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=sgi_diseno_test
+POSTGRES_USER=sgi_diseno
+POSTGRES_PASSWORD=
+POSTGRES_SSL=false
+```
 
 ## Configuración SMTP
 
@@ -91,14 +97,11 @@ SMTP_FROM="SGI Diseño y Desarrollo <cuenta@empresa.com>"
 SMTP_REJECT_UNAUTHORIZED=true
 ```
 
-El envío SMTP está implementado con módulos nativos de Node.js, sin dependencias adicionales.
-
-## Arquitectura modular
+## Arquitectura
 
 ```text
-SGI-Dise-o-y-Desarrollo-v1.8.2/
+SGI-Dise-o-y-Desarrollo/
 ├── backend/
-│   ├── data/
 │   ├── src/
 │   │   ├── config/
 │   │   ├── db/
@@ -110,20 +113,26 @@ SGI-Dise-o-y-Desarrollo-v1.8.2/
 │   └── uploads/
 ├── frontend/
 │   └── src/
-│       ├── api/
-│       ├── components/
-│       ├── features/
-│       ├── pages/
-│       └── utils/
 ├── shared/
-└── docs/
+├── docs/
+├── Dockerfile
+└── docker-compose.yml
 ```
 
-No existe una carpeta `apps`; frontend y backend están separados en la raíz.
+Frontend y backend están separados en la raíz.
 
 ## Ejecución local
 
-Requiere Node.js 20 o superior.
+Requiere Node.js 20 o superior y PostgreSQL 16.
+
+Con Docker:
+
+```bash
+cp backend/.env.example backend/.env
+docker compose up -d --build
+```
+
+Sin Docker, con una instancia PostgreSQL disponible:
 
 ```bash
 npm install
@@ -133,32 +142,22 @@ npm run dev
 
 - Frontend: `http://localhost:5173`
 - Backend: `http://localhost:4000`
+- Health: `http://localhost:4000/api/health`
 
-## Usuarios de prueba
+## Seed
 
-Todos usan contraseña `1234`.
-
-| Usuario | Rol |
-|---|---|
-| `admin` | Administrador |
-| `jefe` | Jefe de Desarrollo |
-| `brand` | Brand Manager |
-| `analista` | Analista de Producto |
-| `marketing` | Marketing |
-| `compras` | Compras / Comex |
-| `desarrollador` | Desarrollador |
-| `fabrica` | Fábrica |
-| `diseno` | Diseño |
-| `audiovisual` | Audiovisual |
-| `comercial` | Comercial |
-| `rrhh` | Recursos Humanos |
-
-## Persistencia
-
-La versión de prueba utiliza `backend/data/db.json`. Para regenerar los datos de prueba:
+Para regenerar los datos de prueba:
 
 ```bash
 npm run seed
 ```
 
-Esto sobrescribe la base local de prueba.
+El seed reinicializa el estado PostgreSQL con los datos definidos en `backend/src/db/initialData.js`.
+
+## Ambiente de testing
+
+La rama destinada al ambiente de prueba es:
+
+`testing`
+
+La rama `main` queda reservada para versiones validadas y promoción controlada a producción.
